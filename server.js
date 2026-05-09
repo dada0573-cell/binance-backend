@@ -132,6 +132,31 @@ ws.on("close", () => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
+});
+
+const WebSocketServer = require("ws").Server;
+
+const wss = new WebSocketServer({ server });
+
+wss.on("connection", (client) => {
+
+  console.log("Frontend conectado vía WebSocket");
+
+  setInterval(() => {
+
+    const lastTrade = trades[trades.length - 1] || null;
+
+    client.send(JSON.stringify({
+      type: "BALANCE",
+      payload: {
+        balance,
+        totalTrades: trades.length,
+        lastTrade
+      }
+    }));
+
+  }, 2000);
+
 });
